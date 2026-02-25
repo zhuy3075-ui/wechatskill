@@ -198,6 +198,7 @@ python scripts/originality_quality_gate.py -a article.md -s source1.md source2.m
 - `humanity_score`：人味分数（要求 >=60）
 - `template_sentence_ratio`：模板化句子比例（越低越好）
 - `emotion_density`：情绪词密度（过低会被判“情感色彩弱”）
+- `sentence_cv` / `paragraph_cv`：句长与段长离散度（过低表示过于工整）
 - `source_trace_hits`：来源痕迹命中（要求 =0）
 - 不达标时按规则重写并复检，最多 3 轮
 - 默认不整篇重生成：优先原稿定向修复，按未达标项逐轮处理（更省 token）

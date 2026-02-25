@@ -105,6 +105,38 @@ EMOTION_TOKENS = [
     "讨厌",
 ]
 
+ACADEMIC_TOKENS = [
+    "算法",
+    "模型",
+    "实验",
+    "数据集",
+    "性能",
+    "方法",
+    "论文",
+    "机制",
+    "架构",
+    "系统",
+    "the",
+    "model",
+    "transformer",
+    "attention",
+    "dataset",
+    "experiment",
+]
+
+NARRATIVE_TOKENS = [
+    "我",
+    "我们",
+    "他",
+    "她",
+    "那天",
+    "后来",
+    "当时",
+    "回头",
+    "突然",
+    "然后",
+]
+
 
 @dataclass
 class Metrics:
@@ -123,13 +155,22 @@ class Metrics:
     stance_hits: int
     emotion_density: float
     template_sentence_ratio: float
+    lexical_diversity: float
+    sentence_cv: float
+    paragraph_cv: float
+    academic_density: float
+    narrative_density: float
+    domain_label: str
+    ai_risk_level: str
     passed: bool
+
+
 def normalize(text: str) -> str:
     return re.sub(r"\s+", "", text)
 
 
 def split_sentences(text: str) -> list[str]:
-    parts = re.split(r"[。！？；\n]", text)
+    parts = re.split(r"[。！？；.!?;\n]+", text)
     return [p.strip() for p in parts if len(p.strip()) >= 10]
 
 
@@ -190,6 +231,15 @@ def stddev(values: list[float]) -> float:
     return math.sqrt(var)
 
 
+def coef_var(values: list[float]) -> float:
+    if not values:
+        return 0.0
+    mean = sum(values) / len(values)
+    if mean == 0:
+        return 0.0
+    return stddev(values) / mean
+
+
 def count_matches(patterns: list[str], text: str) -> int:
     total = 0
     for p in patterns:
@@ -203,6 +253,14 @@ def token_density(text: str, tokens: list[str]) -> float:
         return 0.0
     hits = sum(norm.count(token) for token in tokens)
     return hits / max(1, len(norm) / 100)
+
+
+def lexical_diversity(text: str) -> float:
+    # Character-level diversity for mixed Chinese/English content.
+    norm = normalize(text)
+    if not norm:
+        return 0.0
+    return len(set(norm)) / len(norm)
 
 
 def sentence_token_ratio(sentences: list[str], tokens: list[str]) -> float:
@@ -277,26 +335,66 @@ def evaluate(
     sent_std = stddev(sent_lengths)
     para_std = stddev(para_lengths)
 
-    ai_score = 0.0
-    ai_score += min(35.0, filler_hits * 3.5)
-    if sent_std < 6:
-        ai_score += 20
-    elif sent_std < 9:
-        ai_score += 10
-    if para_std < 25:
-        ai_score += 15
-    elif para_std < 40:
-        ai_score += 8
-    if re.search(r"首先[，,].*其次[，,].*最后[，,]", article, flags=re.S):
-        ai_score += 20
-    ai_score = max(0.0, min(100.0, ai_score))
-
     scene_density = token_density(article, SCENE_TOKENS)
     colloquial_ratio = sentence_token_ratio(article_sentences, COLLOQUIAL_TOKENS)
     stance_hits = count_matches(STANCE_TOKENS, article)
     emotion_density = token_density(article, EMOTION_TOKENS)
     tpl_ratio = template_sentence_ratio(article_sentences)
+    academic_density = token_density(article.lower(), ACADEMIC_TOKENS)
+    narrative_density = token_density(article, NARRATIVE_TOKENS)
+    lex_div = lexical_diversity(article)
+    sentence_cv = coef_var(sent_lengths)
+    paragraph_cv = coef_var(para_lengths)
     sentence_variation = sent_std
+
+    # Domain-aware interpretation: detection should reflect style risk,
+    # not binary "AI source" judgment.
+    if academic_density >= 0.45:
+        domain_label = "academic"
+    elif narrative_density >= 0.45:
+        domain_label = "narrative"
+    else:
+        domain_label = "general"
+
+    base_filler = min(35.0, filler_hits * 3.5)
+    base_template = min(20.0, tpl_ratio * 50.0)
+    if re.search(r"首先[，,].*其次[，,].*最后[，,]", article, flags=re.S):
+        base_template += 20
+
+    uniformity_penalty = 0.0
+    diversity_penalty = 0.0
+    style_penalty = 0.0
+
+    # Structural uniformity penalty (too neat == high machine-like risk).
+    if sentence_cv < 0.28:
+        uniformity_penalty += 12
+    elif sentence_cv < 0.38:
+        uniformity_penalty += 6
+    if paragraph_cv < 0.35:
+        uniformity_penalty += 10
+    elif paragraph_cv < 0.50:
+        uniformity_penalty += 5
+
+    # Low diversity is often associated with repetitive generated text.
+    if lex_div < 0.11:
+        diversity_penalty += 12
+    elif lex_div < 0.14:
+        diversity_penalty += 6
+
+    # Emotion/colloquial signals are domain-sensitive.
+    if domain_label == "academic":
+        if emotion_density < 0.06:
+            style_penalty += 2
+        uniformity_penalty *= 0.45
+        diversity_penalty *= 0.5
+    else:
+        if emotion_density < 0.15:
+            style_penalty += 8
+        if colloquial_ratio < 0.05:
+            style_penalty += 5
+
+    ai_score = base_filler + base_template + uniformity_penalty + diversity_penalty + style_penalty
+    ai_score = max(0.0, min(100.0, ai_score))
 
     humanity = 50.0
     humanity += min(20.0, scene_density * 8.0)
@@ -313,12 +411,13 @@ def evaluate(
         humanity -= 10
     humanity = max(0.0, min(100.0, humanity))
 
-    ai_score += min(20.0, tpl_ratio * 50.0)
-    if emotion_density < 0.15:
-        ai_score += 8
-    ai_score = max(0.0, min(100.0, ai_score))
-
     passed = originality >= min_originality and ai_score <= max_ai and humanity >= min_humanity
+    if ai_score >= 70:
+        risk_level = "high"
+    elif ai_score >= 40:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
     return Metrics(
         originality_score=round(originality, 2),
         ai_tone_score=round(ai_score, 2),
@@ -335,6 +434,13 @@ def evaluate(
         stance_hits=stance_hits,
         emotion_density=round(emotion_density, 4),
         template_sentence_ratio=round(tpl_ratio, 4),
+        lexical_diversity=round(lex_div, 4),
+        sentence_cv=round(sentence_cv, 4),
+        paragraph_cv=round(paragraph_cv, 4),
+        academic_density=round(academic_density, 4),
+        narrative_density=round(narrative_density, 4),
+        domain_label=domain_label,
+        ai_risk_level=risk_level,
         passed=passed,
     )
 
@@ -376,6 +482,13 @@ def main() -> None:
     print(f"stance_hits: {metrics.stance_hits}")
     print(f"emotion_density: {metrics.emotion_density}")
     print(f"template_sentence_ratio: {metrics.template_sentence_ratio}")
+    print(f"lexical_diversity: {metrics.lexical_diversity}")
+    print(f"sentence_cv: {metrics.sentence_cv}")
+    print(f"paragraph_cv: {metrics.paragraph_cv}")
+    print(f"academic_density: {metrics.academic_density}")
+    print(f"narrative_density: {metrics.narrative_density}")
+    print(f"domain_label: {metrics.domain_label}")
+    print(f"ai_risk_level: {metrics.ai_risk_level}")
     print(f"passed: {metrics.passed}")
 
 
