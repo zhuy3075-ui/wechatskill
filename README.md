@@ -180,6 +180,10 @@ python scripts/export_titles_csv.py
 - 金句数量规则：按总句子数的 `10%` 自动控制（四舍五入，短文至少 1 句）
 - 金句质量规则：深刻、有趣、典型，至少满足其中 2 项
 
+范文学习补充：
+- 投喂范文时必须提供“作者名/账号名”
+- 风格档案按作者归档：`styles/[作者名].md`
+
 ### 5.6 原创度与去 AI 味自动量化
 
 新增质检脚本：
@@ -192,6 +196,8 @@ python scripts/originality_quality_gate.py -a article.md -s source1.md source2.m
 - `originality_score`：原创度分数（要求 >=70）
 - `ai_tone_score`：AI 味分数（要求 <=30）
 - `humanity_score`：人味分数（要求 >=60）
+- `template_sentence_ratio`：模板化句子比例（越低越好）
+- `emotion_density`：情绪词密度（过低会被判“情感色彩弱”）
 - `source_trace_hits`：来源痕迹命中（要求 =0）
 - 不达标时按规则重写并复检，最多 3 轮
 - 默认不整篇重生成：优先原稿定向修复，按未达标项逐轮处理（更省 token）

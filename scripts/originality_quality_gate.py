@@ -88,6 +88,23 @@ STANCE_TOKENS = [
     "在我看来",
 ]
 
+EMOTION_TOKENS = [
+    "震惊",
+    "愤怒",
+    "难过",
+    "心酸",
+    "开心",
+    "害怕",
+    "焦虑",
+    "兴奋",
+    "遗憾",
+    "心疼",
+    "失望",
+    "庆幸",
+    "喜欢",
+    "讨厌",
+]
+
 
 @dataclass
 class Metrics:
@@ -104,6 +121,8 @@ class Metrics:
     colloquial_ratio: float
     sentence_variation: float
     stance_hits: int
+    emotion_density: float
+    template_sentence_ratio: float
     passed: bool
 def normalize(text: str) -> str:
     return re.sub(r"\s+", "", text)
@@ -196,6 +215,25 @@ def sentence_token_ratio(sentences: list[str], tokens: list[str]) -> float:
     return hit / len(sentences)
 
 
+def template_sentence_ratio(sentences: list[str]) -> float:
+    if not sentences:
+        return 0.0
+    patterns = [
+        r"在当今",
+        r"值得注意的是",
+        r"综上所述",
+        r"首先",
+        r"其次",
+        r"最后",
+        r"不可否认",
+    ]
+    hit = 0
+    for s in sentences:
+        if any(re.search(p, s) for p in patterns):
+            hit += 1
+    return hit / len(sentences)
+
+
 def evaluate(
     article: str,
     sources: list[str],
@@ -256,19 +294,29 @@ def evaluate(
     scene_density = token_density(article, SCENE_TOKENS)
     colloquial_ratio = sentence_token_ratio(article_sentences, COLLOQUIAL_TOKENS)
     stance_hits = count_matches(STANCE_TOKENS, article)
+    emotion_density = token_density(article, EMOTION_TOKENS)
+    tpl_ratio = template_sentence_ratio(article_sentences)
     sentence_variation = sent_std
 
     humanity = 50.0
     humanity += min(20.0, scene_density * 8.0)
     humanity += min(20.0, colloquial_ratio * 80.0)
     humanity += min(15.0, stance_hits * 4.0)
+    humanity += min(10.0, emotion_density * 3.0)
     if sentence_variation < 6:
         humanity -= 20
     elif sentence_variation < 9:
         humanity -= 10
+    if tpl_ratio > 0.2:
+        humanity -= 10
     if ai_score > 40:
         humanity -= 10
     humanity = max(0.0, min(100.0, humanity))
+
+    ai_score += min(20.0, tpl_ratio * 50.0)
+    if emotion_density < 0.15:
+        ai_score += 8
+    ai_score = max(0.0, min(100.0, ai_score))
 
     passed = originality >= min_originality and ai_score <= max_ai and humanity >= min_humanity
     return Metrics(
@@ -285,6 +333,8 @@ def evaluate(
         colloquial_ratio=round(colloquial_ratio, 4),
         sentence_variation=round(sentence_variation, 4),
         stance_hits=stance_hits,
+        emotion_density=round(emotion_density, 4),
+        template_sentence_ratio=round(tpl_ratio, 4),
         passed=passed,
     )
 
@@ -324,6 +374,8 @@ def main() -> None:
     print(f"colloquial_ratio: {metrics.colloquial_ratio}")
     print(f"sentence_variation: {metrics.sentence_variation}")
     print(f"stance_hits: {metrics.stance_hits}")
+    print(f"emotion_density: {metrics.emotion_density}")
+    print(f"template_sentence_ratio: {metrics.template_sentence_ratio}")
     print(f"passed: {metrics.passed}")
 
 
