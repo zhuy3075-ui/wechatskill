@@ -47,6 +47,9 @@ disable-model-invocation: false
 ```
 /wechat-writer [文章类型] [主题/关键词]
 /wechat-writer [文章类型] [主题/关键词] --style [风格名称]
+/wechat-writer 风格参考（列出当前可用 styles）
+/wechat-writer 风格推荐 [主题/素材]（返回 Top3 推荐 + 理由）
+/wechat-writer 输出格式 [md/json/both]
 ```
 
 ### 学习范文
@@ -163,6 +166,10 @@ wechat-writer/
 ├── prompt.md               # 提示词：可复制到其他 AI 工具使用
 ├── prompts/
 │   └── advanced-reference.md # 低频参考：去AI味完整版与使用指南
+├── scripts/                 # 自动化工具脚本
+│   ├── originality_quality_gate.py # 原创度/AI味/人味评分闸门
+│   ├── style_recommender.py # 风格清单与推荐
+│   └── article_output_formatter.py # 成果输出格式转换（md/json/both）
 ├── style-guide.md          # 写作风格指南：语气、用词、金句、标题、开幕雷击
 ├── topic-guide.md          # 选题与对标指南：选题方法论、赛马机制、对标体系
 ├── formatting.md           # 微信排版规范：段落、标题、强调、图片
@@ -191,6 +198,7 @@ wechat-writer/
 │   ├── README.md           # 学习流程和拆解框架
 │   └── samples/            # 用户上传的范文原文
 └── styles/                 # 已学习的风格文件
+    ├── README.md            # 风格文件字段说明
     └── (通过学习范文自动生成)
 ```
 
@@ -208,6 +216,9 @@ wechat-writer/
 4. 扫描 [memory/feedback.md](memory/feedback.md)，获取用户偏好
 5. 扫描 [self-evolution.md](self-evolution.md) 的「用户习惯档案」
 6. 如果指定了 `--style`，加载 `styles/` 对应的风格文件，并按以下优先级合并规则
+7. 如果未指定 `--style`，先提醒当前可用风格；再根据用户主题/素材做 Top3 风格推荐（理由：关键词匹配、类型匹配、语气/结构匹配）
+8. 若 `styles/` 为空：明确提示“当前无已学习风格”，回退到 personality.md + style-guide.md 默认风格
+9. 说明：以上推荐逻辑由 agent 在流程内直接执行；`scripts/style_recommender.py` 仅供人工调试/验证，不作为主流程依赖
 
 #### 风格合并优先级（`--style` 模式）
 
@@ -554,6 +565,16 @@ wechat-writer/
 4. **关键词标签**（3-5 个，用于文章标签）
 5. **封面图建议**（描述适合的封面图风格/内容）
 6. **风险评估**（🟢🟡🟠🔴 + 简要说明）
+
+#### 成果输出模式（`SHOULD`）
+
+- 默认：`md`（公众号发布友好）
+- 可选：`json`（结构化入库）、`both`（同时输出）
+- 当用户指定输出模式时，按该模式交付：
+  - `md`：可直接复制发布
+  - `json`：包含标题、摘要、标签、分节、质量分
+  - `both`：同时给 `md + json`
+- 说明：输出模式决策由 agent 在主流程内执行；`scripts/article_output_formatter.py` 仅供人工调试/验证
 
 ### 第八步补充：非创作任务成果格式（复盘/优化/分析类）
 

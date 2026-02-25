@@ -14,6 +14,8 @@
 6. 素材管理：`M-XXX` 素材主键、分类、标签、质量分、月度健康检查
 7. 多平台改写：公众号 -> 小红书 / 知乎 / 短视频
 8. 评论区与 SEO：互动运营方案 + 搜一搜关键词布局
+9. 风格推荐：创作前列出可用风格 + 基于素材的 Top3 推荐
+10. 成果输出：支持 `md/json/both` 三种交付模式
 
 ## 2. 目录说明
 
@@ -28,6 +30,8 @@
 - `self-evolution.md`：自我进化与风格防污染机制
 - `personality.md` / `soul.md`：人格层与底线层
 - `risk-check.md`：风险检测详细规则
+- `scripts/style_recommender.py`：风格清单与 Top3 推荐
+- `scripts/article_output_formatter.py`：成品输出为 `md/json/both`
 
 ## 3. 快速上手
 
@@ -57,6 +61,9 @@
 
 - `/wechat-writer 干货 时间管理`
 - `/wechat-writer 观点 AI对教育的影响 --style 犀利派`
+- `/wechat-writer 风格参考`
+- `/wechat-writer 风格推荐 AI教育素材`
+- `/wechat-writer 输出格式 both`
 
 学习：
 
@@ -180,6 +187,39 @@ python scripts/originality_quality_gate.py -a article.md -s source1.md source2.m
 - 不达标时按规则重写并复检，最多 3 轮
 
 AI 写作特征清单见：`ai-writing-signatures.md`
+
+### 5.7 风格参考与推荐
+
+列出当前可用风格：
+
+```bash
+python scripts/style_recommender.py --list-only
+```
+
+按主题/素材推荐 Top3 风格：
+
+```bash
+python scripts/style_recommender.py --content "AI教育带来的机会和焦虑" --article-type 观点 --top-k 3
+```
+
+规则：
+- 若用户未指定 `--style`，先给“可用风格清单 + 推荐风格”
+- 若用户已指定 `--style`，以用户指定为准
+
+### 5.8 成果输出模式
+
+支持三种输出模式：
+- `md`：默认，适合直接发布公众号
+- `json`：结构化成果，适合系统入库/复盘
+- `both`：同时输出 `md + json`
+
+格式化命令：
+
+```bash
+python scripts/article_output_formatter.py -i article.md --mode both --style 犀利派 --article-type 观点 --originality 78 --ai-tone 22 --humanity 65
+```
+
+默认输出目录：`outputs/`
 
 ## 6. 质量保障链路
 

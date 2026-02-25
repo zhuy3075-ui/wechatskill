@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 
+from utils import read_text
+
 
 SOURCE_TRACE_PATTERNS = [
     r"引用原文",
@@ -103,17 +105,6 @@ class Metrics:
     sentence_variation: float
     stance_hits: int
     passed: bool
-
-
-def read_text(path: Path) -> str:
-    for enc in ("utf-8-sig", "utf-8", "gb18030"):
-        try:
-            return path.read_text(encoding=enc)
-        except UnicodeDecodeError:
-            continue
-    raise UnicodeDecodeError("unknown", b"", 0, 1, f"Cannot decode file: {path}")
-
-
 def normalize(text: str) -> str:
     return re.sub(r"\s+", "", text)
 
