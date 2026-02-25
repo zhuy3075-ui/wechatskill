@@ -125,6 +125,45 @@
 - 自创金句 -> `memory/golden-sentences.md`
 - 外部提取素材（含外部金句/观点）-> `memory/materials.md`
 
+### 5.4 导出 CSV（便于表格查看/复用）
+
+可把 `memory/materials.md` 一键导出为 CSV：
+
+```bash
+python scripts/export_materials_csv.py
+```
+
+自定义输入/输出路径：
+
+```bash
+python scripts/export_materials_csv.py -i memory/materials.md -o memory/materials.csv
+```
+
+导出字段包括：`id, category, summary, source, track, use_type, tags, quality, added_date, used_in`。
+
+金句库导出：
+
+```bash
+python scripts/export_golden_sentences_csv.py
+```
+
+标题库导出：
+
+```bash
+python scripts/export_titles_csv.py
+```
+
+默认输出文件：
+- `memory/materials.csv`
+- `memory/golden-sentences.csv`
+- `memory/titles.csv`
+
+### 5.5 金句/标题从素材库自学习
+
+- 金句：写作前自动读取 `materials.md` 的「金句观点 + 类比比喻」分区，学习表达模式后生成原创金句
+- 标题：写作前自动读取 `materials.md` 的「标题技巧」分区，学习句式后生成标题候选
+- 约束：只学习质量分 `>=4` 且来源清晰的素材；不允许原句照抄；必要时记录 `M-XXX` 来源ID
+
 ## 6. 质量保障链路
 
 每篇文章默认经过：
@@ -194,4 +233,3 @@
 - 规则变更记录：见 `SKILL.md` 的“规则变更日志”
 - 主流程：稳定
 - 素材系统：已主键化（`M-XXX`）
-

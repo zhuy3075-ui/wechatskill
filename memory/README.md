@@ -15,6 +15,9 @@ memory/
 ├── calendar.md            # 内容日历：发布排期、节假日规划、内容搭配
 ├── feedback.md            # 反馈记录：用户对文章的修改意见和偏好
 ├── materials.md           # 素材库：案例、数据、故事等可复用素材
+├── materials.csv          # 素材库导出：用于表格查看、外部系统导入
+├── golden-sentences.csv   # 金句库导出：用于表格查看、外部系统导入
+├── titles.csv             # 标题库导出：用于表格查看、外部系统导入
 └── audience.md            # 读者画像：目标读者的特征和偏好
 ```
 
@@ -42,6 +45,17 @@ memory/
    - 来源/备注
    ```
 
+4. 素材导出（CSV）：
+   - 执行：`python scripts/export_materials_csv.py`
+   - 默认输入：`memory/materials.md`
+   - 默认输出：`memory/materials.csv`
+   - 可选参数：`-i` 指定输入文件，`-o` 指定输出文件
+
+5. 金句/标题导出（CSV）：
+   - 金句：`python scripts/export_golden_sentences_csv.py` → `memory/golden-sentences.csv`
+   - 标题：`python scripts/export_titles_csv.py` → `memory/titles.csv`
+   - 两个脚本都支持 `-i/-o` 参数自定义输入输出
+
 ### 读取规则
 1. 开始新文章创作前，扫描记忆库获取：
    - 用户偏好的写作风格
@@ -62,6 +76,11 @@ memory/
    - audience.md（读者画像）
    - golden-sentences.md（金句复用）
    - materials.md（素材复用）
+
+3. 自学习联动：
+   - 金句生成前，先读取 `materials.md` 的「金句观点/类比比喻」分区提炼表达模式
+   - 标题生成前，先读取 `materials.md` 的「标题技巧」分区提炼句式
+   - 仅学习质量分 `>=4` 素材，不直接复制原文
 
 ### 维护规则
 
