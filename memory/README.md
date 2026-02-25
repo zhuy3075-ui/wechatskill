@@ -87,6 +87,9 @@ memory/
 
 | 数据类型 | 存储位置 | 不要存到 |
 |---------|---------|---------|
+| 自创金句（创作中产出的） | golden-sentences.md | ~~materials.md~~ |
+| 外部金句/观点（对标文章提取的） | materials.md 第三节 | ~~golden-sentences.md~~ |
+| 案例/数据/结构/标题技巧/类比 | materials.md（按分类） | ~~golden-sentences.md~~ |
 | 标题效果数据 | titles.md | ~~performance.md~~ |
 | 文章整体效果数据 | performance.md | ~~feedback.md~~ |
 | 用户修改偏好 | feedback.md | ~~performance.md~~ |

@@ -320,7 +320,11 @@ wechat-writer/
 - 查看 [memory/performance.md](memory/performance.md) 获取高效写作模式和效果基准线
 - 查看 [memory/benchmarks.md](memory/benchmarks.md) 获取对标账号情报
 - 查看 [memory/calendar.md](memory/calendar.md) 确认本周排期
-- 查看 [memory/materials.md](memory/materials.md) 获取可用素材
+- 查看 [memory/materials.md](memory/materials.md) 获取可用素材：
+  - 按当前文章的赛道筛选同赛道素材
+  - 按文章类型筛选适用类型匹配的素材
+  - 按主题关键词匹配标签（#标签）
+  - 列出匹配到的素材清单（如有），供构思时参考
 
 ### 第三步：内心独白（仅写文章时执行）
 
@@ -495,7 +499,15 @@ wechat-writer/
 3. **类型自动识别**：用评分矩阵判定文章类型（主类型+副类型+混合比例+置信度），输出判定结果
 4. 按 8 个维度进行深度拆解（类型特征/结构/排版/语气/文风/金句/论证/互动）
 5. 生成风格文件，保存到 `styles/[风格名称].md`
-6. 提取优质金句和素材，存入 `memory/`
+6. **素材提取**（自动执行，按分类存入 [memory/materials.md](memory/materials.md)）：
+   - 案例故事（可引用的事件/人物经历）→ materials.md 第一节
+   - 数据论据（统计数据/调查结果）→ materials.md 第二节
+   - 金句观点（对标文章中的精彩表达）→ materials.md 第三节
+   - 结构模板（值得复用的局部结构/开头/结尾模式）→ materials.md 第四节
+   - 标题技巧（爆款标题的句式/用词技巧）→ materials.md 第五节
+   - 类比比喻 → materials.md 第六节
+   - 每条素材必须标注：来源（文章标题+账号）、赛道、适用类型、关键词标签
+   - 自创金句（创作过程中产出的）→ memory/golden-sentences.md（不存 materials.md）
 7. **风格冲突检测**（详见 [self-evolution.md](self-evolution.md) 第九节）：
    - 提取范文风格特征，与 personality.md 当前维度对比
    - 无冲突 → 正常执行第 8 步
@@ -540,5 +552,8 @@ wechat-writer/
 | 使用指南/快速开始 | prompt.md | 面向外部 AI 工具用户 |
 | 风险检测清单 | SKILL.md（入口）+ risk-check.md（详细规则） | |
 | 写作风格规则 | style-guide.md | SKILL.md 和 prompt.md 均不重复 |
+| 素材提取分类规范 | materials.md（格式）+ SKILL.md（提取步骤）+ prompt.md（提示词） | 三者分工不重复 |
+| 自创金句 | golden-sentences.md | 不存 materials.md |
+| 外部素材（案例/数据/结构等） | materials.md | 不存 golden-sentences.md |
 
 **修改原则**：改规则时只改归属文件，另一个文件通过引用指向，不复制内容。
