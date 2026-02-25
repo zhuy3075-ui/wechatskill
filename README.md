@@ -164,6 +164,23 @@ python scripts/export_titles_csv.py
 - 标题：写作前自动读取 `materials.md` 的「标题技巧」分区，学习句式后生成标题候选
 - 约束：只学习质量分 `>=4` 且来源清晰的素材；不允许原句照抄；必要时记录 `M-XXX` 来源ID
 
+### 5.6 原创度与去 AI 味自动量化
+
+新增质检脚本：
+
+```bash
+python scripts/originality_quality_gate.py -a article.md -s source1.md source2.md --min-originality 70 --max-ai-tone 30 --min-humanity 60 --strict-source-trace
+```
+
+说明：
+- `originality_score`：原创度分数（要求 >=70）
+- `ai_tone_score`：AI 味分数（要求 <=30）
+- `humanity_score`：人味分数（要求 >=60）
+- `source_trace_hits`：来源痕迹命中（要求 =0）
+- 不达标时按规则重写并复检，最多 3 轮
+
+AI 写作特征清单见：`ai-writing-signatures.md`
+
 ## 6. 质量保障链路
 
 每篇文章默认经过：
