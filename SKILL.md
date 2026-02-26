@@ -152,7 +152,7 @@ disable-model-invocation: false
 - `/wechat-writer 观点 AI对教育的影响`
 - `/wechat-writer 清单 2024年最值得读的10本书`
 - `/wechat-writer 干货 时间管理 --style 犀利派`
-- `用梁靠谱风格写一篇观点文，主题是AI教育的误区`
+- `用某作者风格写一篇观点文，主题是AI教育的误区`
 
 ### 跨 AI 自然语言等价调用（通用适配层）
 

@@ -1,2 +1,4 @@
 outputs/
 outputs_test/
+.claude/
+output_draft.md
