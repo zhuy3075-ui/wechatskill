@@ -15,7 +15,7 @@
 7. 多平台改写：公众号 -> 小红书 / 知乎 / 短视频
 8. 评论区与 SEO：互动运营方案 + 搜一搜关键词布局
 9. 风格推荐：创作前列出可用风格 + 基于素材的 Top3 推荐
-10. 成果输出：支持 `md/json/both` 三种交付模式
+10. 成果输出：支持 `md/json/both/wechat` 四种交付模式
 11. 对标学习：默认 20 篇样本，实验组/对照组分组验证策略
 
 ## 2. 目录说明
@@ -32,7 +32,8 @@
 - `personality.md` / `soul.md`：人格层与底线层
 - `risk-check.md`：风险检测详细规则
 - `scripts/style_recommender.py`：风格清单与 Top3 推荐
-- `scripts/article_output_formatter.py`：成品输出为 `md/json/both`
+- `scripts/article_output_formatter.py`：成品输出为 `md/json/both/wechat`
+- `outputs/`：默认成品落地目录（脚本模式）
 
 ## 3. 快速上手
 
@@ -65,12 +66,15 @@
 - `/wechat-writer 风格参考`
 - `/wechat-writer 风格推荐 AI教育素材`
 - `/wechat-writer 输出格式 both`
+- `/wechat-writer 输出格式 wechat`
 
 自然语言（推荐）：
 
 - `写一篇观点文章，主题是AI对教育的影响`
 - `用理性派风格写这个主题：年轻人如何做职业选择`
 - `把这段素材改成故事型公众号文章`
+- `先给我推荐一个最适合这次主题的风格，再直接写`
+- `用梁靠谱风格写，直接给公众号可粘贴版本`
 
 学习：
 
@@ -111,6 +115,13 @@
 ### 4.3 冲突与回退
 
 若信息不足或规则冲突，使用 `SKILL.md` 中的“失败回退模板”，先交付最小可用成果，再引导补齐信息。
+
+### 4.4 范文学习作者校验（必须）
+
+- 投喂范文时必须提供作者名/账号名
+- 缺失作者信息时，先追问，不进入拆解
+- 风格文件按作者名归档：`styles/[作者名].md`
+- 禁止匿名覆盖已有风格文件
 
 ## 5. 素材系统
 
@@ -223,6 +234,29 @@ python scripts/style_recommender.py --content "AI教育带来的机会和焦虑"
 - 若用户未指定 `--style`，先给“可用风格清单 + 推荐风格”
 - 若用户已指定 `--style`，以用户指定为准
 - 用户提示文案建议：`直接告诉我“用XX风格写”即可，不必记命令参数`
+- 风格学习支持“标点怪癖迁移”：可学习口头禅+标点组合及轻微错误标点（以可读性为底线）
+
+### 5.8 成果输出模式与交付回执
+
+支持四种输出模式：
+- `md`：默认，适合 Markdown 编辑器后再转公众号
+- `json`：结构化成果，适合系统入库/复盘
+- `both`：同时输出 `md + json`
+- `wechat`：公众号编辑器直贴纯文本（移除 Markdown 标记）
+
+格式化命令：
+
+```bash
+python scripts/article_output_formatter.py -i article.md --mode wechat --style 犀利派 --article-type 观点 --originality 78 --ai-tone 22 --humanity 65
+```
+
+默认输出目录：`outputs/`
+
+每次交付建议附“回执”：
+- `mode`
+- `saved_to`（文件路径；若未写盘则标注“仅会话输出”）
+- `quality_scores`（原创度/AI味/人味）
+- `copy_hint`（直贴 or 先转 Markdown）
 
 ### 5.9 中文路径处理（范文/对标）
 
@@ -234,21 +268,6 @@ python scripts/style_recommender.py --content "AI教育带来的机会和焦虑"
 ```bash
 python scripts/path_manifest.py --dir "C:\\你的目录" --pattern "*.txt"
 ```
-
-### 5.8 成果输出模式
-
-支持三种输出模式：
-- `md`：默认，适合直接发布公众号
-- `json`：结构化成果，适合系统入库/复盘
-- `both`：同时输出 `md + json`
-
-格式化命令：
-
-```bash
-python scripts/article_output_formatter.py -i article.md --mode both --style 犀利派 --article-type 观点 --originality 78 --ai-tone 22 --humanity 65
-```
-
-默认输出目录：`outputs/`
 
 ## 6. 质量保障链路
 

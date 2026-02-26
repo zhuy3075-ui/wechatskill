@@ -56,7 +56,7 @@ disable-model-invocation: false
 /wechat-writer [文章类型] [主题/关键词] --style [风格名称]
 /wechat-writer 风格参考（列出当前可用 styles）
 /wechat-writer 风格推荐 [主题/素材]（返回 Top3 推荐 + 理由）
-/wechat-writer 输出格式 [md/json/both]
+/wechat-writer 输出格式 [md/json/both/wechat]
 ```
 
 ### 学习范文
@@ -177,7 +177,7 @@ wechat-writer/
 ├── scripts/                 # 自动化工具脚本
 │   ├── originality_quality_gate.py # 原创度/AI味/人味评分闸门
 │   ├── style_recommender.py # 风格清单与推荐
-│   ├── article_output_formatter.py # 成果输出格式转换（md/json/both）
+│   ├── article_output_formatter.py # 成果输出格式转换（md/json/both/wechat）
 │   └── path_manifest.py     # 目录扫描并生成文件ID映射（中文路径友好）
 ├── style-guide.md          # 写作风格指南：语气、用词、金句、标题、开幕雷击
 ├── topic-guide.md          # 选题与对标指南：选题方法论、赛马机制、对标体系
@@ -225,7 +225,7 @@ wechat-writer/
 4. 扫描 [memory/feedback.md](memory/feedback.md)，获取用户偏好
 5. 扫描 [self-evolution.md](self-evolution.md) 的「用户习惯档案」
 6. 如果指定了 `--style`，加载 `styles/` 对应的风格文件，并按以下优先级合并规则
-7. 如果未指定 `--style`，先提醒当前可用风格；再根据用户主题/素材做 Top3 风格推荐（理由：关键词匹配、类型匹配、语气/结构匹配）
+7. 如果未指定 `--style`，先提醒当前可用风格；再根据用户主题/素材做 Top3 风格推荐（理由：关键词匹配、类型匹配、语气/结构匹配）；同时提示用户可直接说“用XX风格写”
 8. 若 `styles/` 为空：明确提示“当前无已学习风格”，回退到 personality.md + style-guide.md 默认风格
 9. 说明：以上推荐逻辑由 agent 在流程内直接执行；`scripts/style_recommender.py` 仅供人工调试/验证，不作为主流程依赖
 
@@ -518,6 +518,7 @@ wechat-writer/
 - 观点 + 案例 + 总结 三段式展开
 - 使用过渡句连接段落，保持阅读流畅感
 - 正文禁止出现任何「引用原文」痕迹：不写“引用原文/原文如下/据原文/来源：”，不贴原文句子，不使用引号复刻原句；只保留改写后的原创表达
+- 如使用 `--style`：允许迁移该风格的标志性口头禅、标点组合和轻微“非标准标点习惯”，以增强作者识别度
 
 #### 结尾规则
 - 总结核心观点（一句话版本）
@@ -559,6 +560,8 @@ wechat-writer/
 - [ ] 全文字数是否在目标范围
 - [ ] 排版是否符合 formatting.md 规范
 - [ ] 是否有错别字或病句
+- [ ] 标点节奏是否自然（情绪标点与空行有起伏，不是全篇同一种标点）
+- [ ] 若启用 `--style`，是否保留了该作者的标点怪癖与口头禅特征（可控范围内）
 - [ ] 是否符合 soul.md 的灵魂 DNA（底线检查）
 - [ ] 文风是否与当前 personality.md 性格维度一致
 - [ ] 是否具备“人味”：有明确立场句、具体场景细节、自然对话感（至少各 1 处）
@@ -621,16 +624,33 @@ wechat-writer/
 4. **关键词标签**（3-5 个，用于文章标签）
 5. **封面图建议**（描述适合的封面图风格/内容）
 6. **风险评估**（🟢🟡🟠🔴 + 简要说明）
+7. **交付回执**（模式、文件路径、质量分、下一步动作）
 
 #### 成果输出模式（`SHOULD`）
 
 - 默认：`md`（公众号发布友好）
-- 可选：`json`（结构化入库）、`both`（同时输出）
+- 可选：`json`（结构化入库）、`both`（同时输出）、`wechat`（公众号编辑器直贴纯文本）
 - 当用户指定输出模式时，按该模式交付：
   - `md`：可直接复制发布
   - `json`：包含标题、摘要、标签、分节、质量分
   - `both`：同时给 `md + json`
+  - `wechat`：移除 Markdown 标记，输出纯文本排版版
 - 说明：输出模式决策由 agent 在主流程内执行；`scripts/article_output_formatter.py` 仅供人工调试/验证
+
+#### 落地文件规范（`SHOULD`）
+
+- 默认输出目录：`outputs/`
+- 文件命名：`{日期}-{文章类型}-{主题关键词}.{ext}`（关键词不可用时退回输入文件名）
+- 模式与扩展名：
+  - `md` -> `.md`
+  - `json` -> `.json`
+  - `both` -> `.md + .json`
+  - `wechat` -> `.txt`
+- 每次交付末尾必须输出“交付回执”，至少包含：
+  - `mode`
+  - `saved_to`（实际写入路径；未写盘则写“仅会话输出”）
+  - `quality_scores`（originality/ai_tone/humanity）
+  - `copy_hint`（如“公众号直贴建议使用 wechat 模式”）
 
 ### 第八步补充：非创作任务成果格式（复盘/优化/分析类）
 
@@ -703,7 +723,12 @@ wechat-writer/
 4. 生成/更新作者风格档案：`styles/[作者名].md`
 5. **类型自动识别**：用评分矩阵判定文章类型（主类型+副类型+混合比例+置信度），输出判定结果
 6. 按 8 个维度进行深度拆解（类型特征/结构/排版/语气/文风/金句/论证/互动）
-7. **素材提取**（自动执行，按分类存入 [memory/materials.md](memory/materials.md)）：
+7. 额外拆解“标点与怪癖风格”：
+   - 标点偏好（。/？/！/——/……）
+   - 连续标点习惯（如“？！”，重复感叹）
+   - 口头禅+标点组合（如“说白了——”）
+   - 可读性影响的错误标点模式（在风格调用时可控迁移）
+8. **素材提取**（自动执行，按分类存入 [memory/materials.md](memory/materials.md)）：
    - 案例故事（可引用的事件/人物经历）→ materials.md 第一节
    - 数据论据（统计数据/调查结果）→ materials.md 第二节
    - 金句观点（对标文章中的精彩表达）→ materials.md 第三节
@@ -712,19 +737,19 @@ wechat-writer/
    - 类比比喻 → materials.md 第六节
    - 每条素材必须标注：来源（文章标题+账号）、赛道、适用类型、关键词标签
    - 自创金句（创作过程中产出的）→ memory/golden-sentences.md（不存 materials.md）
-8. **风格冲突检测**（详见 [self-evolution.md](self-evolution.md) 第九节）：
+9. **风格冲突检测**（详见 [self-evolution.md](self-evolution.md) 第九节）：
    - 提取范文风格特征，与 personality.md 当前维度对比
    - 无冲突 → 正常执行第 8 步
    - 风格偏离/冲突 → 风格只存 styles/，personality.md 不变，告知用户“下次直接说‘用这个风格写’即可调用”
    - 如果 `locked = all` → 跳过第 8 步
    - 如果 `locked = [维度列表]` → 第 8 步仅更新未锁定维度，锁定维度保持不变
-9. **人格消化**（仅在无冲突且未全局锁定时执行）：根据范文风格，微调 `personality.md` 性格维度（±0.5）
+10. **人格消化**（仅在无冲突且未全局锁定时执行）：根据范文风格，微调 `personality.md` 性格维度（±0.5）
    - 犀利的范文 → 犀利度↑、批判性↑
    - 温暖的范文 → 温暖度↑、故事感↑
    - 幽默的范文 → 幽默感↑、烟火气↑
    - 深度的范文 → 深度偏好↑、文艺气质↑
-10. 更新 personality.md 的「成长履历」和「心境日记」
-11. 向用户展示分析结果 + 风格摘要 + 人格变化报告（或"风格已存档，人格未变"）
+11. 更新 personality.md 的「成长履历」和「心境日记」
+12. 向用户展示分析结果 + 风格摘要 + 人格变化报告（或"风格已存档，人格未变"）
 
 ---
 
