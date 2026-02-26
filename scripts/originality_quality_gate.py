@@ -158,6 +158,8 @@ class Metrics:
     lexical_diversity: float
     sentence_cv: float
     paragraph_cv: float
+    short_paragraph_ratio: float
+    dash_density: float
     academic_density: float
     narrative_density: float
     domain_label: str
@@ -292,6 +294,18 @@ def template_sentence_ratio(sentences: list[str]) -> float:
     return hit / len(sentences)
 
 
+def short_paragraph_ratio(paragraphs: list[str]) -> float:
+    if not paragraphs:
+        return 0.0
+    hit = 0
+    for p in paragraphs:
+        norm = re.sub(r"\s+", "", p)
+        # One-sentence short paragraph is useful occasionally, but overuse creates fragmentation.
+        if len(split_sentences(p)) <= 1 and len(norm) <= 18:
+            hit += 1
+    return hit / len(paragraphs)
+
+
 def evaluate(
     article: str,
     sources: list[str],
@@ -330,7 +344,8 @@ def evaluate(
     if strict_trace and trace_hits > 0:
         originality = 0.0
 
-    para_lengths = [len(re.sub(r"\s+", "", p)) for p in split_paragraphs(article)]
+    paragraphs = split_paragraphs(article)
+    para_lengths = [len(re.sub(r"\s+", "", p)) for p in paragraphs]
     sent_lengths = [len(re.sub(r"\s+", "", s)) for s in article_sentences]
     sent_std = stddev(sent_lengths)
     para_std = stddev(para_lengths)
@@ -340,6 +355,8 @@ def evaluate(
     stance_hits = count_matches(STANCE_TOKENS, article)
     emotion_density = token_density(article, EMOTION_TOKENS)
     tpl_ratio = template_sentence_ratio(article_sentences)
+    short_para_ratio = short_paragraph_ratio(paragraphs)
+    dash_density = normalize(article).count("——") / max(1, len(normalize(article)) / 100)
     academic_density = token_density(article.lower(), ACADEMIC_TOKENS)
     narrative_density = token_density(article, NARRATIVE_TOKENS)
     lex_div = lexical_diversity(article)
@@ -392,6 +409,14 @@ def evaluate(
             style_penalty += 8
         if colloquial_ratio < 0.05:
             style_penalty += 5
+        if short_para_ratio > 0.22:
+            style_penalty += 6
+        elif short_para_ratio > 0.18:
+            style_penalty += 3
+        if dash_density > 1.0:
+            style_penalty += 4
+        elif dash_density > 0.7:
+            style_penalty += 2
 
     ai_score = base_filler + base_template + uniformity_penalty + diversity_penalty + style_penalty
     ai_score = max(0.0, min(100.0, ai_score))
@@ -437,6 +462,8 @@ def evaluate(
         lexical_diversity=round(lex_div, 4),
         sentence_cv=round(sentence_cv, 4),
         paragraph_cv=round(paragraph_cv, 4),
+        short_paragraph_ratio=round(short_para_ratio, 4),
+        dash_density=round(dash_density, 4),
         academic_density=round(academic_density, 4),
         narrative_density=round(narrative_density, 4),
         domain_label=domain_label,
@@ -485,6 +512,8 @@ def main() -> None:
     print(f"lexical_diversity: {metrics.lexical_diversity}")
     print(f"sentence_cv: {metrics.sentence_cv}")
     print(f"paragraph_cv: {metrics.paragraph_cv}")
+    print(f"short_paragraph_ratio: {metrics.short_paragraph_ratio}")
+    print(f"dash_density: {metrics.dash_density}")
     print(f"academic_density: {metrics.academic_density}")
     print(f"narrative_density: {metrics.narrative_density}")
     print(f"domain_label: {metrics.domain_label}")
