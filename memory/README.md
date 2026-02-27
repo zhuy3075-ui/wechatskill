@@ -7,7 +7,8 @@
 ```
 memory/
 ├── README.md              # 本说明文件
-├── golden-sentences.md    # 金句库：收集每次创作中产生的优质金句
+├── golden-sentences.md    # 金句库：收集每次创作中产生的优质金句（含风格标签和句式模式）
+├── viewpoints.md          # 观点与立场库：用户核心观点、价值判断、立场倾向
 ├── titles.md              # 标题自学习库：标题效果档案、高效模式、偏好画像
 ├── topics.md              # 选题库：CSV 格式管理，按赛道分类，含爆款潜力评分
 ├── performance.md         # 数据复盘：文章发布效果追踪、高效写作模式、效果基准线
@@ -25,19 +26,30 @@ memory/
 
 ### 写入规则
 1. 每次完成一篇文章后，自动提取以下内容写入记忆库：
-   - 产生的优质金句 → `golden-sentences.md`
+   - 产生的优质金句 → `golden-sentences.md`（含风格标签和句式类型）
    - 标题选择和效果 → `titles.md`
    - 选题信息和效果 → `topics.md`（CSV 格式，按赛道分类）
    - 用户的修改反馈 → `feedback.md`
    - 使用的案例素材 → `materials.md`
 
-2. 发布后效果数据写入：
+2. 用户提供文章时，自动提取：
+   - 核心观点和用户立场 → `viewpoints.md`
+   - 文章中的金句 → 自创金句存 `golden-sentences.md`，外部金句存 `materials.md`
+   - 用户风格特征 → `feedback.md` + `self-evolution.md` 习惯档案
+
+3. 对话过程中持续捕捉：
+   - 用户表达的观点和态度 → `viewpoints.md`
+   - 用户的风格偏好信号 → `feedback.md`
+
+4. 发布后效果数据写入：
    - 文章效果数据 → `performance.md`（阅读量、分享率、涨粉等）
    - 对标账号分析 → `benchmarks.md`
    - 排期更新 → `calendar.md`
 
-3. 写入格式：
+5. 写入格式：
    - **materials.md**：使用素材卡片格式（`[M-XXX] 摘要 + 来源/赛道/标签` 字段），详见 materials.md 使用说明
+   - **viewpoints.md**：使用观点卡片格式（`[V-XXX] 观点 + 来源/话题/立场强度`），详见 viewpoints.md 使用说明
+   - **golden-sentences.md**：使用金句卡片格式（`[G-XXX] 金句 + 风格/句式/话题`），详见 golden-sentences.md 使用说明
    - **其他文件**：使用日期+标题格式：
    ```
    ## [日期] [文章标题]
@@ -45,13 +57,13 @@ memory/
    - 来源/备注
    ```
 
-4. 素材导出（CSV）：
+6. 素材导出（CSV）：
    - 执行：`python scripts/export_materials_csv.py`
    - 默认输入：`memory/materials.md`
    - 默认输出：`memory/materials.csv`
    - 可选参数：`-i` 指定输入文件，`-o` 指定输出文件
 
-5. 金句/标题导出（CSV）：
+7. 金句/标题导出（CSV）：
    - 金句：`python scripts/export_golden_sentences_csv.py` → `memory/golden-sentences.csv`
    - 标题：`python scripts/export_titles_csv.py` → `memory/titles.csv`
    - 两个脚本都支持 `-i/-o` 参数自定义输入输出
@@ -68,13 +80,14 @@ memory/
 
 2. 记忆调用优先级：
    - feedback.md（用户偏好最优先）
+   - viewpoints.md（用户立场和观点倾向）
    - performance.md（效果数据指导策略）
    - titles.md（标题偏好和高效模式）
    - topics.md（选题库，避免重复选题）
    - calendar.md（排期，确认当前任务）
    - benchmarks.md（对标情报）
    - audience.md（读者画像）
-   - golden-sentences.md（金句复用）
+   - golden-sentences.md（金句复用，含风格匹配）
    - materials.md（素材复用）
 
 3. 自学习联动：
@@ -88,6 +101,7 @@ memory/
 | 文件 | 上限 | 淘汰规则 |
 |------|------|---------|
 | golden-sentences.md | 100 条 | 删除使用次数最少的、超过 6 个月未使用的 |
+| viewpoints.md | 150 条 | 「不确定」立场超 3 个月未确认的移入待确认区 |
 | titles.md 效果档案 | 200 条 | 保留全部（数据越多学习越准） |
 | topics.md CSV | 500 条 | 已弃选题超过 3 个月的删除，已写选题保留 |
 | performance.md 效果档案 | 不限 | 保留全部（核心数据资产） |
@@ -111,6 +125,7 @@ memory/
 |---------|---------|---------|
 | 自创金句（创作中产出的） | golden-sentences.md | ~~materials.md~~ |
 | 外部金句/观点（对标文章提取的） | materials.md 第三节 | ~~golden-sentences.md~~ |
+| 用户核心观点和立场 | viewpoints.md | ~~feedback.md~~ ~~materials.md~~ |
 | 案例/数据/结构/标题技巧/类比 | materials.md（按分类） | ~~golden-sentences.md~~ |
 | 标题效果数据 | titles.md | ~~performance.md~~ |
 | 文章整体效果数据 | performance.md | ~~feedback.md~~ |
