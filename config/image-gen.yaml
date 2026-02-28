@@ -1,0 +1,26 @@
+# ============================================================
+# 云雾 API 配图生成配置
+# ============================================================
+#
+# 首次使用请填写 api_key，其他参数可保持默认
+# 修改方式：直接编辑本文件，或告诉 AI "修改 API 配置"
+# ============================================================
+
+# ---- API 连接 ----
+api_url: "https://yunwu.ai"
+api_key: ""                  # 必填：你的云雾 API Key
+
+# ---- 模型选择 ----
+# banana pro（默认，质量更高）: gemini-3-pro-image-preview
+# banana 2（速度更快）:         gemini-3.1-flash-image-preview
+default_model: "gemini-3-pro-image-preview"
+
+# ---- 图片参数 ----
+default_aspect_ratio: "16:9"    # 正文配图和封面图统一 16:9
+default_image_size: "1K"        # 清晰度
+
+# ---- 并发与重试 ----
+max_concurrent: 3               # 最大并发生成数
+max_retries: 3                  # 单张失败重试次数
+retry_delay: 2                  # 首次重试间隔（秒），后续指数递增
+timeout: 60                     # 单次请求超时（秒）
