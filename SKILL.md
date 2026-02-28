@@ -178,7 +178,8 @@ wechat-writer/
 │   ├── originality_quality_gate.py # 原创度/AI味/人味评分闸门
 │   ├── style_recommender.py # 风格清单与推荐
 │   ├── article_output_formatter.py # 成果输出格式转换（md/json/both/wechat）
-│   └── path_manifest.py     # 目录扫描并生成文件ID映射（中文路径友好）
+│   ├── path_manifest.py     # 目录扫描并生成文件ID映射（中文路径友好）
+│   └── sync-to-local.sh     # 增量同步工具：只同步修改文件，保护用户数据
 ├── style-guide.md          # 写作风格指南：语气、用词、金句、标题、开幕雷击
 ├── topic-guide.md          # 选题与对标指南：选题方法论、赛马机制、对标体系
 ├── formatting.md           # 微信排版规范：段落、标题、强调、图片
