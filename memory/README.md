@@ -35,7 +35,7 @@ memory/
 2. 用户提供文章时，自动提取：
    - 核心观点和用户立场 → `viewpoints.md`
    - 文章中的金句 → 自创金句存 `golden-sentences.md`，外部金句存 `materials.md`
-   - 用户风格特征 → `feedback.md` + `self-evolution.md` 习惯档案
+   - 用户风格特征 → `feedback.md` + `core/self-evolution.md` 习惯档案
 
 3. 对话过程中持续捕捉：
    - 用户表达的观点和态度 → `viewpoints.md`

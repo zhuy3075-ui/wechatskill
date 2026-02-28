@@ -5,26 +5,26 @@
 本仓库用于微信公众号写作 skill 的开发维护，包含：
 
 1. 主流程规则（写作/学习/复盘/回写）
-2. 风格与人格系统（`soul.md` + `personality.md` + `styles/`）
+2. 风格与人格系统（`core/soul.md` + `core/personality.md` + `styles/`）
 3. 素材与数据闭环（`memory/`）
 4. 自动化脚本（`scripts/`）
 
-用户侧操作说明见：`USER_GUIDE.md`。
+用户侧操作说明见：`docs/USER_GUIDE.md`。
 
 ## 2. 架构与职责
 
 - `SKILL.md`：执行流程与裁决优先级（唯一流程来源）
-- `prompt.md`：可复制提示词模板（不定义总流程）
-- `style-guide.md`：风格/用词/标点规范
-- `risk-check.md`：发布前合规标准
-- `self-evolution.md`：进化、防污染、锁定策略
+- `prompts/prompt.md`：可复制提示词模板（不定义总流程）
+- `rules/style-guide.md`：风格/用词/标点规范
+- `rules/risk-check.md`：发布前合规标准
+- `core/self-evolution.md`：进化、防污染、锁定策略
 - `templates/`：五类文章结构模板
 - `styles/`：学习生成的作者风格
 - `memory/`：素材、标题、金句、表现数据、对标账号、排期
 
 ## 3. 主流程（开发视角）
 
-1. 唤醒人格：加载 `soul.md`、`personality.md`、`memory/feedback.md`
+1. 唤醒人格：加载 `core/soul.md`、`core/personality.md`、`memory/feedback.md`
 2. 参数推断：最小追问，缺失时走回退模板
 3. 输出大纲：标题候选 + 结构 + 结尾策略
 4. 生文：模板 + 风格规则 + 素材匹配
@@ -37,10 +37,10 @@
 
 `--style` 模式下合并顺序：
 
-1. `soul.md`（最高，不可突破）
+1. `core/soul.md`（最高，不可突破）
 2. `styles/[name].md`（语气/结构/文风/金句）
-3. `personality.md`（未覆盖维度）
-4. `style-guide.md + templates/ + formatting.md`（兜底）
+3. `core/personality.md`（未覆盖维度）
+4. `rules/style-guide.md + templates/ + rules/formatting.md`（兜底）
 
 说明：风格只改“怎么写”，不改“我是谁”。
 补充：偏好分层为“全局偏好 > 风格偏好”，风格间偏好互不继承。
@@ -112,7 +112,7 @@ python scripts/path_manifest.py --dir "C:\\你的目录" --pattern "*.txt"
 1. 删除本地私有数据：`.claude/`
 2. 删除测试输出：`output_draft.md`、`outputs_test/`
 3. 检查 `styles/` 是否包含个人投喂风格
-4. 检查 `personality.md` 是否为可公开状态
+4. 检查 `core/personality.md` 是否为可公开状态
 5. 运行回归样例（写作/学习/复盘/改写/素材检索）
 
 ## 9. 建议提交流程

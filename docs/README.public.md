@@ -53,7 +53,7 @@
 
 ## 文档入口
 
-- 用户操作手册：`USER_GUIDE.md`
+- 用户操作手册：`docs/USER_GUIDE.md`
 - 详细规则：`SKILL.md`
-- 提示词库：`prompt.md`
+- 提示词库：`prompts/prompt.md`
 - 开发维护版：`README.dev.md`

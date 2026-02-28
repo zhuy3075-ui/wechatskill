@@ -63,7 +63,7 @@
 2. `memory/golden-sentences.md`：金句沉淀
 3. `memory/materials.md`：案例/数据/标题技巧等素材
 4. `memory/performance.md`：效果复盘
-5. `personality.md`：人格慢速微调（受锁定与冲突规则约束）
+5. `core/personality.md`：人格慢速微调（受锁定与冲突规则约束）
 
 ### 4.3 你可以主动触发
 
