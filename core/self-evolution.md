@@ -340,7 +340,7 @@
 
 ### 每次创作后自动执行：
 
-1. **标题学习**（详见 [memory/titles.md](memory/titles.md)）
+1. **标题学习**（详见 [memory/titles.md](../memory/titles.md)）
    - 用户最终选择了哪个标题？修改了什么？
    - 用户是否提供了阅读量/打开率等效果数据？
    - 用户是否提供了对标爆款标题？
@@ -371,14 +371,14 @@
    - 用户自己写的金句是什么风格？
    - 记录到 → `memory/golden-sentences.md`（含风格标签）
 
-6. **选题库学习**（详见 [memory/topics.md](memory/topics.md)）
+6. **选题库学习**（详见 [memory/topics.md](../memory/topics.md)）
    - 用户提供了对标文章？→ 批量提取选题，按赛道分类保存 CSV
    - 文章完成后 → 自动归档选题信息 + 衍生 3-5 个相关选题
    - 用户反馈了效果数据？→ 关联到对应选题记录
    - 积累 20+ 选题后 → 自动分析赛道偏好、高效选题模式
    - 记录到 → `memory/topics.md`（CSV 格式）
 
-7. **效果数据学习**（详见 [memory/performance.md](memory/performance.md)）
+7. **效果数据学习**（详见 [memory/performance.md](../memory/performance.md)）
    - 用户提供了发布效果数据？→ 录入效果档案，关联写作策略
    - 积累 5 篇同类型 → 分析该类型的效果趋势和最佳写法
    - 积累 10 篇任意 → 全面效果排名（最佳类型/赛道/开头/时间/字数）
@@ -386,13 +386,13 @@
    - 连续 3 篇效果差 → 触发策略调整预警
    - 记录到 → `memory/performance.md` + `习惯档案`
 
-8. **对标账号学习**（详见 [memory/benchmarks.md](memory/benchmarks.md)）
+8. **对标账号学习**（详见 [memory/benchmarks.md](../memory/benchmarks.md)）
    - 用户提供了对标账号文章？→ 分析风格、爆款规律、差异化方向
    - 积累 3+ 个对标账号 → 自动分析竞争格局和空白机会
    - 对标账号有新爆款？→ 更新爆款规律，提取可借鉴模式
    - 记录到 → `memory/benchmarks.md`
 
-9. **排期学习**（详见 [memory/calendar.md](memory/calendar.md)）
+9. **排期学习**（详见 [memory/calendar.md](../memory/calendar.md)）
    - 用户设定了发布节奏？→ 记录到排期系统
    - 文章发布后 → 更新排期状态
    - 积累发布时间数据后 → 分析最佳发布时段

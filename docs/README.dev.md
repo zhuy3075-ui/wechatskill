@@ -105,6 +105,17 @@ python scripts/export_titles_csv.py
 python scripts/path_manifest.py --dir "C:\\你的目录" --pattern "*.txt"
 ```
 
+### 7.6 本地配置（安全）
+
+- 微信配置默认读取 `config/wechat.local.yaml`（兼容旧版 `config/wechat.yaml`）
+- 配图配置默认读取 `config/image-gen.local.yaml`（兼容旧版 `config/image-gen.yaml`）
+- `config/*.local.yaml` 已加入 `.gitignore`，建议只在本地文件填真实密钥
+
+### 7.7 增量同步脚本环境说明
+
+- `scripts/sync-to-local.sh` 推荐在 Linux/macOS/Git-Bash 运行
+- 依赖命令：`find`、`mktemp`、`cp`、`rm`，以及 `md5sum/md5/openssl` 之一
+
 ## 8. 分发与发布规范
 
 发布前检查：

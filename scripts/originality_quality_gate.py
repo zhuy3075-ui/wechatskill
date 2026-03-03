@@ -10,7 +10,11 @@ from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
 
-from utils import read_text
+try:
+    from .utils import read_text
+except ImportError:
+    # Support running as: python scripts/originality_quality_gate.py
+    from utils import read_text
 
 
 SOURCE_TRACE_PATTERNS = [
@@ -436,7 +440,18 @@ def evaluate(
         humanity -= 10
     humanity = max(0.0, min(100.0, humanity))
 
-    passed = originality >= min_originality and ai_score <= max_ai and humanity >= min_humanity
+    policy_passed = (
+        trace_hits == 0
+        and tpl_ratio <= 0.12
+        and sentence_cv >= 0.35
+        and paragraph_cv >= 0.45
+    )
+    passed = (
+        originality >= min_originality
+        and ai_score <= max_ai
+        and humanity >= min_humanity
+        and policy_passed
+    )
     if ai_score >= 70:
         risk_level = "high"
     elif ai_score >= 40:

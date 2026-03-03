@@ -11,6 +11,10 @@
 # 用法：
 #   bash scripts/sync-to-local.sh              # 使用默认路径
 #   bash scripts/sync-to-local.sh [目标路径]    # 指定目标路径
+#
+# 运行环境：
+#   - 推荐 Linux / macOS / Git-Bash（Windows）
+#   - 依赖: find, mktemp, cp, rm, 以及 md5sum/md5/openssl 之一
 # ============================================================
 
 # ---- 颜色 ----
@@ -41,7 +45,18 @@ is_skipped() {
     esac
 }
 
-file_hash() { md5sum "$1" 2>/dev/null | cut -d' ' -f1; }
+file_hash() {
+    if command -v md5sum >/dev/null 2>&1; then
+        md5sum "$1" 2>/dev/null | cut -d' ' -f1
+    elif command -v md5 >/dev/null 2>&1; then
+        md5 -q "$1" 2>/dev/null
+    elif command -v openssl >/dev/null 2>&1; then
+        openssl md5 "$1" 2>/dev/null | awk '{print $2}'
+    else
+        log_err "未找到可用的文件哈希命令（md5sum/md5/openssl）"
+        exit 1
+    fi
+}
 
 # ---- 主流程 ----
 echo ""

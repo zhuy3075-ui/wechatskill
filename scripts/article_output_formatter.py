@@ -8,7 +8,11 @@ import json
 import re
 from pathlib import Path
 
-from utils import read_text
+try:
+    from .utils import read_text
+except ImportError:
+    # Support running as: python scripts/article_output_formatter.py
+    from utils import read_text
 
 
 def detect_title(lines: list[str]) -> str:

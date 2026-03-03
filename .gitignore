@@ -2,3 +2,6 @@ outputs/
 outputs_test/
 .claude/
 output_draft.md
+config/.wechat_token_cache.json
+config/*.local.yaml
+scripts/__pycache__/

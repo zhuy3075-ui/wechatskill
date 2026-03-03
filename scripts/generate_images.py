@@ -30,6 +30,11 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
 
+# Windows 终端 UTF-8 兼容
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 # ---- 依赖检查 ----
 try:
     import yaml
@@ -116,25 +121,40 @@ class ConfigManager:
     }
 
     def __init__(self, config_path: Optional[str] = None):
+        script_dir = Path(__file__).resolve().parent
+        self.project_root = script_dir.parent
+        self.local_config_path = self.project_root / "config" / "image-gen.local.yaml"
+        self.legacy_config_path = self.project_root / "config" / "image-gen.yaml"
         if config_path is None:
-            # 自动查找 config 目录
-            script_dir = Path(__file__).resolve().parent
-            project_root = script_dir.parent
-            config_path = project_root / "config" / "image-gen.yaml"
+            # Prefer local config to avoid accidental secret commit.
+            config_path = self.local_config_path
         self.config_path = Path(config_path)
+        self.loaded_from_path = self.config_path
         self.config = {}
 
     def load(self) -> dict:
         """加载配置，文件不存在时创建模板"""
-        if not self.config_path.exists():
+        load_path = self.config_path
+        if (
+            not load_path.exists()
+            and self.config_path == self.local_config_path
+            and self.legacy_config_path.exists()
+        ):
+            # Backward compatibility: only fallback when legacy file has a real key.
+            with open(self.legacy_config_path, "r", encoding="utf-8") as f:
+                legacy_config = yaml.safe_load(f) or {}
+            if legacy_config.get("api_key"):
+                load_path = self.legacy_config_path
+        if not load_path.exists():
             self._create_template()
             raise ConfigError(
                 f"配置文件已创建：{self.config_path}\n"
                 f"请填写 api_key 后重试。"
             )
 
-        with open(self.config_path, "r", encoding="utf-8") as f:
+        with open(load_path, "r", encoding="utf-8") as f:
             self.config = yaml.safe_load(f) or {}
+        self.loaded_from_path = load_path
 
         # 合并默认值
         for key, default in self.DEFAULT_CONFIG.items():
@@ -148,7 +168,7 @@ class ConfigManager:
         if not self.config.get("api_key"):
             raise ConfigError(
                 f"API Key 未配置。\n"
-                f"请编辑 {self.config_path}，填写 api_key 字段。"
+                f"请编辑 {self.loaded_from_path}，填写 api_key 字段。"
             )
         if not self.config.get("api_url"):
             raise ConfigError("API URL 未配置。")

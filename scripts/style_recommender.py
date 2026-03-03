@@ -8,7 +8,11 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from utils import read_text
+try:
+    from .utils import read_text
+except ImportError:
+    # Support running as: python scripts/style_recommender.py
+    from utils import read_text
 
 TOKEN_SPLIT_RE = re.compile(r"[，。！？、；：,\s\-\|/]+")
 CHINESE_TOKEN_RE = re.compile(r"[\u4e00-\u9fff]{2,}")
@@ -31,6 +35,8 @@ class StyleProfile:
     structure: str = ""
     suitable_types: set[str] = field(default_factory=set)
     keywords: set[str] = field(default_factory=set)
+
+
 def normalize_tokens(text: str) -> set[str]:
     tokens = set()
     for token in TOKEN_SPLIT_RE.split(text):
