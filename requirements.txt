@@ -1,0 +1,8 @@
+# 仅配图生成 / 公众号草稿脚本需要；其他 Python 工具主要使用标准库。
+PyYAML>=6.0
+requests>=2.28
+Pillow>=10.0
+mistune>=3.0
+premailer>=3.10
+# 配图异步请求；不安装时原脚本可以降级同步执行。
+aiohttp>=3.8

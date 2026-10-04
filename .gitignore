@@ -1,0 +1,32 @@
+# 本地凭证与配置（保留 .example 模板）
+.env
+.env.*
+!.env.example
+**/config/*.local.yaml
+**/config/.wechat_token_cache.json
+*.pem
+*.key
+
+# 成品、缓存与临时文件
+**/outputs/
+**/outputs_test/
+**/output_draft.md
+**/__pycache__/
+*.py[cod]
+*.preview.html
+*.log
+.venv/
+venv/
+node_modules/
+modules/
+.pytest_cache/
+
+# 个人范文、工具状态与本地交接
+**/learning/samples/
+.claude/
+.codex/
+.idea/
+.vscode/
+docs/codex/
+.DS_Store
+Thumbs.db

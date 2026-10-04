@@ -1,0 +1,17 @@
+# 复制本文件为 config/wechat.local.yaml 后填写真实凭证
+# config/wechat.local.yaml 已加入 .gitignore，不会被提交
+
+appid: ""              # 开发者ID（AppID）
+appsecret: ""          # 开发者密码（AppSecret）
+
+# 草稿中的作者字段（可选）
+default_author: ""
+
+# access_token 缓存文件路径（自动管理，无需手动修改）
+token_cache_file: "config/.wechat_token_cache.json"
+
+# 封面图压缩参数
+cover_max_size_kb: 64
+cover_target_width: 900
+cover_target_height: 500
+cover_initial_quality: 85

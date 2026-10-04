@@ -1,0 +1,14 @@
+# 复制本文件为 config/image-gen.local.yaml 后填写真实密钥
+# config/image-gen.local.yaml 已加入 .gitignore，不会被提交
+
+api_url: "https://yunwu.ai"
+api_key: ""
+
+default_model: "gemini-3-pro-image-preview"
+default_aspect_ratio: "16:9"
+default_image_size: "1K"
+
+max_concurrent: 3
+max_retries: 3
+retry_delay: 2
+timeout: 60
